@@ -89,7 +89,7 @@ getSummaryStatistics <- function() {
 
 # Exporting the data into a text file
 export <- function() {
-  write.table(meanData, "averageData.txt", sep="\t")
+  write.table(meanData, "tidyData.txt", sep="\t")
 }
 
 readFromFiles()
