@@ -39,6 +39,7 @@ createDataSet <- function() {
   data <- cbind(xData, activity, subject)
   names(data)[562] <- "activity"
   names(data)[563] <- "subject"
+  
   data
 }
 
@@ -89,7 +90,7 @@ getSummaryStatistics <- function() {
 
 # Exporting the data into a text file
 export <- function() {
-  write.table(meanData, "tidyData.txt", sep="\t")
+  write.table(meanData, "tidyData.txt", sep="\t", row.names = FALSE)
 }
 
 readFromFiles()
