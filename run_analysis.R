@@ -13,21 +13,22 @@ readFromFiles <- function() {
   features <<- read.table("./features.txt")
 }
 
+
 # Applying descriptive names the activity levels
 describeActivities <- function() {
-  yTest$V1[yTest$V1==1] <<- "Walk"
+  yTest$V1[yTest$V1==1] <<- "Walking"
   yTest$V1[yTest$V1==2] <<- "Walk_Upstairs"
   yTest$V1[yTest$V1==3] <<- "Walk_Downstairs"
-  yTest$V1[yTest$V1==4] <<- "Sit"
-  yTest$V1[yTest$V1==5] <<- "Stand"
-  yTest$V1[yTest$V1==6] <<- "Lay"
+  yTest$V1[yTest$V1==4] <<- "Sitting"
+  yTest$V1[yTest$V1==5] <<- "Standing"
+  yTest$V1[yTest$V1==6] <<- "Laying"
   
-  yTrain$V1[yTrain$V1==1] <<- "Walk"
+  yTrain$V1[yTrain$V1==1] <<- "Walking"
   yTrain$V1[yTrain$V1==2] <<- "Walk_Upstairs"
   yTrain$V1[yTrain$V1==3] <<- "Walk_downstairs"
-  yTrain$V1[yTrain$V1==4] <<- "Sit"
-  yTrain$V1[yTrain$V1==5] <<- "Stand"
-  yTrain$V1[yTrain$V1==6] <<- "Lay"
+  yTrain$V1[yTrain$V1==4] <<- "Sitting"
+  yTrain$V1[yTrain$V1==5] <<- "Standing"
+  yTrain$V1[yTrain$V1==6] <<- "Laying"
 }
 
 # Creating full data set
@@ -39,7 +40,7 @@ createDataSet <- function() {
   data <- cbind(xData, activity, subject)
   names(data)[562] <- "activity"
   names(data)[563] <- "subject"
-# return data frame to caller
+  # return data frame to caller
   data
 }
 
@@ -93,16 +94,10 @@ createTidyDataFile <- function() {
   write.table(meanData, "tidyData.txt", sep="\t", row.names = FALSE)
 }
 
-run_analysis <- function(){
-  readFromFiles()
-  describeActivities()
-  data <- createDataSet()
-  addDimensionsToDuplicatedColumns()
-  getSummaryStatistics()
-  createTidyDataFile()
-}
 
-run_analysis()
-
-
-
+readFromFiles()
+describeActivities()
+data <- createDataSet()
+addDimensionsToDuplicatedColumns()
+getSummaryStatistics()
+createTidyDataFile()
