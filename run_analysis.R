@@ -1,4 +1,3 @@
-setwd("/Users/rajeevvij/Documents/DocRep/~Coursera/Cleaning_Data/UCI_HAR_Dataset")
 require(sqldf)
 
 # Reading data from the given files into R
