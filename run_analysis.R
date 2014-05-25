@@ -88,7 +88,6 @@ createTidyDataFile <- function() {
 }
 
 readFromFiles()
-# describeActivities()
 data <- createDataSet()
 addDimensionsToDuplicatedColumns()
 getSummaryStatistics()
