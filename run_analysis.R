@@ -89,13 +89,20 @@ getSummaryStatistics <- function() {
 }
 
 # Exporting the data into a text file
-export <- function() {
+createTidyDataFile <- function() {
   write.table(meanData, "tidyData.txt", sep="\t", row.names = FALSE)
 }
 
-readFromFiles()
-describeActivities()
-data <- createDataSet()
-addDimensionsToDuplicatedColumns()
-getSummaryStatistics()
-export()
+run_analysis <- function(){
+  readFromFiles()
+  describeActivities()
+  data <- createDataSet()
+  addDimensionsToDuplicatedColumns()
+  getSummaryStatistics()
+  createTidyDataFile()
+}
+
+run_analysis()
+
+
+
