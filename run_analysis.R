@@ -1,48 +1,38 @@
+setwd("/Users/rajeevvij/Documents/DocRep/~Coursera/Cleaning_Data/UCI_HAR_Dataset")
+require(sqldf)
+
 # Reading data from the given files into R
 readFromFiles <- function() {
-  subjectTest <<- read.table("./test/subject_test.txt")
-  subjectTrain <<- read.table("./train/subject_train.txt")
+  subjectTest <<- read.table("./test/subject_test.txt", header=F, col.names=c("SubjectID"))
+  subjectTrain <<- read.table("./train/subject_train.txt", header=F, col.names=c("SubjectID"))
   
-  xTest <<- read.table("./test/X_test.txt")
-  xTrain <<- read.table("./train/X_train.txt")
+  # We will read the column names from the features.txt. The file has two columns and only the second column is relevant.
+  data_cols <<- read.table("features.txt", header=F, as.is=T, col.names=c("MeasureID", "MeasureName"))
   
-  yTest <<- read.table("./test/y_test.txt")
-  yTrain <<- read.table("./train/y_train.txt")
+  xTest <<- read.table("./test/X_test.txt", header=F, col.names=data_cols$MeasureName)
+  xTrain <<- read.table("./train/X_train.txt", header=F, col.names=data_cols$MeasureName)
   
-  activityLabels <<- read.table("./activity_labels.txt")
-  features <<- read.table("./features.txt")
+  yTest <<- read.table("./test/y_test.txt", header=F,col.names=c("ActivityID"))
+  yTrain <<- read.table("./train/y_train.txt", header=F, col.names=c("ActivityID"))
+  
+  activityLabels <<- read.table("./activity_labels.txt", header=F, as.is=T, col.names=c("ActivityID", "ActivityName"))
+  activityLabels$ActivityName <- as.factor(activityLabels$ActivityName)
+  
+#  features <<- read.table("./features.txt")
 }
 
-
-# Applying descriptive names the activity levels
-describeActivities <- function() {
-  yTest$V1[yTest$V1==1] <<- "Walking"
-  yTest$V1[yTest$V1==2] <<- "Walk_Upstairs"
-  yTest$V1[yTest$V1==3] <<- "Walk_Downstairs"
-  yTest$V1[yTest$V1==4] <<- "Sitting"
-  yTest$V1[yTest$V1==5] <<- "Standing"
-  yTest$V1[yTest$V1==6] <<- "Laying"
-  
-  yTrain$V1[yTrain$V1==1] <<- "Walking"
-  yTrain$V1[yTrain$V1==2] <<- "Walk_Upstairs"
-  yTrain$V1[yTrain$V1==3] <<- "Walk_downstairs"
-  yTrain$V1[yTrain$V1==4] <<- "Sitting"
-  yTrain$V1[yTrain$V1==5] <<- "Standing"
-  yTrain$V1[yTrain$V1==6] <<- "Laying"
-}
-
-# Creating full data set
 createDataSet <- function() {
-  xData <<- rbind(xTest, xTrain)
-  names(xData) <<- features$V2
-  activity <<- rbind(yTest, yTrain)
-  subject <<- rbind(subjectTest, subjectTrain)
-  data <- cbind(xData, activity, subject)
-  names(data)[562] <- "activity"
-  names(data)[563] <- "subject"
+  xData <- rbind(xTest, xTrain)
+#  names(xData) <<- features$V2
+  yData <- rbind(yTest, yTrain)
+  subject <- rbind(subjectTest, subjectTrain)
+  data <- cbind(xData, yData, subject)
+  names(data)[562] <- "ActivityID"
+  names(data)[563] <- "SubjectID"
   # return data frame to caller
-  data
+  data <- sqldf('SELECT a.*, b.ActivityName as ActivityName FROM data a JOIN activityLabels b USING(ActivityID)')
 }
+
 
 # Add dimensions (X, Y, Z) to duplicated column names
 addDimensionsToDuplicatedColumns <- function() {
@@ -77,26 +67,28 @@ addDimensionsToDuplicatedColumns <- function() {
   }
 }
 
+
 # Obtain the subset of measurements on the mean and standard deviation
 getSummaryStatistics <- function() {
   meanColumnNum <<- grep("[Mm]ean", colnames(data))
   standardDeviationColumnNum <<- grep("[Ss]td", colnames(data))
-  subData <<- data[, c(meanColumnNum, standardDeviationColumnNum, 562, 563)]
+  subData <<- data[, c(meanColumnNum, standardDeviationColumnNum, 562, 563, 564)]
   
-  library(data.table)
+  require(data.table)
   dataTable <<- data.table(subData)
-  meanData <<- dataTable[, lapply(.SD, mean), by=c("subject", "activity")]
-  meanData <<- meanData[order(meanData$subject),]    
+
+  meanData <<- dataTable[, lapply(.SD, mean), by=c("SubjectID", "ActivityID", "ActivityName")]
+  meanData <<- meanData[order(meanData$SubjectID),]    
 }
+
 
 # Exporting the data into a text file
 createTidyDataFile <- function() {
   write.table(meanData, "tidyData.txt", sep="\t", row.names = FALSE)
 }
 
-
 readFromFiles()
-describeActivities()
+# describeActivities()
 data <- createDataSet()
 addDimensionsToDuplicatedColumns()
 getSummaryStatistics()
