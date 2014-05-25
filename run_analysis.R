@@ -39,7 +39,7 @@ createDataSet <- function() {
   data <- cbind(xData, activity, subject)
   names(data)[562] <- "activity"
   names(data)[563] <- "subject"
-  
+# return data frame to caller
   data
 }
 
